@@ -24,7 +24,7 @@ class Commitment {
       }
     });
   }
-  
+
   reject(result) {
     setTimeout(() => {
       if (this.status === Commitment.PENDING) {
@@ -37,24 +37,26 @@ class Commitment {
     });
   }
   then(onFULFIILED, onREJECTED) {
-    onFULFIILED = typeof onFULFIILED === "function" ? onFULFIILED : () => {};
-    onREJECTED = typeof onREJECTED === "function" ? onREJECTED : () => {};
-    if (this.status === Commitment.PENDING) {
-      this.resolveCallbacks.push(onFULFIILED);
-      this.rejectCallbacks.push(onREJECTED);
-    }
-    if (this.status === Commitment.FULFILLED) {
-      onFULFIILED(this.result);
-    }
-    if (this.status === Commitment.REJECTED) {
-      onREJECTED(this.result);
-    }
+    return new Commitment((res, rej) => {
+      onFULFIILED = typeof onFULFIILED === "function" ? onFULFIILED : () => {};
+      onREJECTED = typeof onREJECTED === "function" ? onREJECTED : () => {};
+      if (this.status === Commitment.PENDING) {
+        this.resolveCallbacks.push(onFULFIILED);
+        this.rejectCallbacks.push(onREJECTED);
+      }
+      if (this.status === Commitment.FULFILLED) {
+        onFULFIILED(this.result);
+      }
+      if (this.status === Commitment.REJECTED) {
+        onREJECTED(this.result);
+      }
+    });
   }
 }
 
 let commitment = new Commitment((res, rej) => {
   console.log("1");
-  res(2)
+  res(2);
 });
 
 commitment.then((result) => {
